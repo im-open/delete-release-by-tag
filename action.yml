@@ -1,18 +1,14 @@
-name: 'JavaScript Action Template'
+name: 'delete-release-by-tag'
 
-description: 'Add description here'
+description: 'An action that can be used to delete a GitHub Release by tag.'
 
 inputs:
-  input-1:
-    description: 'Add a description here'
+  github-token:
+    description: 'A GitHub token with permission to delete releases.  Generally secrets.GITHUB_TOKEN.'
     required: true
-  input-2:
-    description: 'Add a description here'
-    required: false
-
-outputs:
-  output-1:
-    description: 'Add a description here'
+  release-tag:
+    description: 'The tag of the release to delete'
+    required: true
 
 runs:
   using: 'node12'

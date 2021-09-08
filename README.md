@@ -1,79 +1,58 @@
-# javascript-action-template
+# delete-release-by-tag
 
-This template can be used to quickly start a new custom js action repository.  Click the `Use this template` button at the top to get started.
-
-## TODOs
-- Readme
-  - [ ] Update the Inputs section with the correct action inputs
-  - [ ] Update the Outputs section with the correct action outputs
-  - [ ] Update the Usage Example section with the correct usage   
-- package.json
-  - [ ] Update the `name` with the new action value
-- src/main.js
-  - [ ] Implement your custom javascript action
-- action.yml
-  - [ ] Fill in the correct name, description, inputs and outputs
-- .prettierrc.json
-  - [ ] Update any preferences you might have
-- CODEOWNERS
-  - [ ] Update as appropriate
-- Repository Settings
-  - [ ] On the *Options* tab check the box to *Automatically delete head branches*
-  - [ ] On the *Options* tab update the repository's visibility (must be done by an org owner)
-  - [ ] On the *Branches* tab add a branch protection rule
-    - [ ] Check *Require pull request reviews before merging*
-    - [ ] Check *Dismiss stale pull request approvals when new commits are pushed*
-    - [ ] Check *Require review from Code Owners*
-    - [ ] Check *Include Administrators*
-  - [ ] On the *Manage Access* tab add the appropriate groups
-- About Section (accessed on the main page of the repo, click the gear icon to edit)
-  - [ ] The repo should have a short description of what it is for
-  - [ ] Add one of the following topic tags:
-    | Topic Tag       | Usage                                    |
-    | --------------- | ---------------------------------------- |
-    | az              | For actions related to Azure             |
-    | code            | For actions related to building code     |
-    | certs           | For actions related to certificates      |
-    | db              | For actions related to databases         |
-    | git             | For actions related to Git               |
-    | iis             | For actions related to IIS               |
-    | microsoft-teams | For actions related to Microsoft Teams   |
-    | svc             | For actions related to Windows Services  |
-    | jira            | For actions related to Jira              |
-    | meta            | For actions related to running workflows |
-    | pagerduty       | For actions related to PagerDuty         |
-    | test            | For actions related to testing           |
-    | tf              | For actions related to Terraform         |
-  - [ ] Add any additional topics for an action if they apply    
-  - [ ] The Packages and Environments boxes can be unchecked
-    
+This action can be used to delete a GitHub Release by tag when one exists.  If the release does not exist, the action will simply return.
 
 ## Inputs
-| Parameter | Is Required | Default | Description           |
-| --------- | ----------- | ------- | --------------------- |
-| `input-1` | true        |         | Description goes here |
-| `input-2` | false       |         | Description goes here |
+| Parameter      | Is Required | Description                                                                                  |
+| -------------- | ----------- | -------------------------------------------------------------------------------------------- |
+| `github-token` | true        | A GitHub token with permission to delete releases.  Generally `${{ secrets.GITHUB_TOKEN }}`. |
+| `release-tag`  | true        | The tag of the release to delete                                                             |
 
 ## Outputs
-| Output     | Description           |
-| ---------- | --------------------- |
-| `output-1` | Description goes here |
+No outputs
 
 ## Usage Examples
 
 ```yml
-# TODO: Fill in the correct usage
+on: 
+  pull_request:
+    types: [opened, reopened, synchronize]
+
 jobs:
-  job1:
+  create-prebuilt-artifacts-release:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
+        with: 
+          fetch-depth: 0
 
-      - name: Add Step Here
-        uses: im-open/this-repo@v1.0.0
+      - name: Calculate next version
+        id: version
+        uses: im-open/git-version-lite@v1.0.0
         with:
-          input-1: 'abc'
-          input-2: '123
+          calculate-prerelease-version: true
+          branch-name: ${{ github.head_ref }}
+
+      # The release might already exist if you hit 're-run jobs' on a workflow run that already
+      # completed once. Creating a release when one already exists will fail, so delete it first.
+      - name: Delete Pre-release if it exists
+        uses: im-open/delete-release-by-tag@v1.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ steps.version.outputs.VERSION }}
+      
+      - name: Create Pre-release
+        id: create_release
+        uses: im-open/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.VERSION }}
+          release_name: ${{ env.VERSION }}
+          draft: false
+          prerelease: true
+      
+      . . .
 ```
 
 ## Recompiling
