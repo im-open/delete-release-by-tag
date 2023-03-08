@@ -49,7 +49,7 @@ jobs:
       # The release might already exist if you hit 're-run jobs' on a workflow run that already
       # completed once. Creating a release when one already exists will fail, so delete it first.
       - name: Delete release if it exists
-        uses: im-open/delete-release-by-tag@v1.1.2
+        uses: im-open/delete-release-by-tag@v1.1.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ steps.version.outputs.VERSION }}
