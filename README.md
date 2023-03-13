@@ -41,7 +41,7 @@ jobs:
 
       - name: Calculate next version
         id: version
-        uses: im-open/git-version-lite@v2.1.2
+        uses: im-open/git-version-lite@v2
         with:
           calculate-prerelease-version: true
           branch-name: ${{ github.head_ref }}
@@ -49,13 +49,15 @@ jobs:
       # The release might already exist if you hit 're-run jobs' on a workflow run that already
       # completed once. Creating a release when one already exists will fail, so delete it first.
       - name: Delete release if it exists
-        uses: im-open/delete-release-by-tag@v1.1.2
+        # You may also reference just the major or major.minor version
+        uses: im-open/delete-release-by-tag@v1.1.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ steps.version.outputs.VERSION }}
       
       - name: Create release
         id: create_release
+        # You may also reference just the major or major.minor version
         uses: im-open/create-release@v3.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

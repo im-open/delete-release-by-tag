@@ -1,6 +1,5 @@
-name: 'delete-release-by-tag'
-
-description: 'An action that can be used to delete a GitHub Release by tag.'
+name: delete-release-by-tag
+description: An action that can be used to delete a GitHub Release by tag.
 
 inputs:
   github-token:
