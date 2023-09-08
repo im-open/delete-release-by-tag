@@ -1,3 +1,7 @@
+# DEPRECATED
+
+This action was deprecated on 2023-09-08 and will no longer receive support or updates.
+
 # delete-release-by-tag
 
 This action can be used to delete a GitHub Release by tag when one exists.  If the release does not exist, the action will simply return.
